@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: d21cdf3cf75db4845a9bdc6c4120965a
+timeCreated: 1547309517
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: SCPix v01
+  fontNames:
+  - SCPix v01
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
