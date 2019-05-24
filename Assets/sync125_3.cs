@@ -21,7 +21,7 @@ public class sync125_3 : MonoBehaviour
     int digit = 0;
     
     string[] words = new[] {
-        "İ'ms'", "ăĠ'n'", "kğ'i", "kĞp'", "ăut'",
+        "İ'ms'", "ăĠ'n'", "kğ'i", "kĞ'p'", "ăut'",
         "ăġ'r", "ăġ'm", "ărs", "kğp'", "kğk",
         "ċ'iċ", "ċ'it", "ĕĂn'", "ĕĪ'n'", "ėrs",
         "Ěit'", "Ěin", "Ěis'", "ĚmĮ'", "ĜĻ'r'",
