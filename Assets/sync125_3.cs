@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using KMHelper;
 using System.Text.RegularExpressions;
+using KModkit;
 
 public class sync125_3 : MonoBehaviour
 {
@@ -17,8 +16,6 @@ public class sync125_3 : MonoBehaviour
 
     public Material off;
     public Material on;
-
-    string screenLabel;
 
     int digit = 0;
 
@@ -65,7 +62,7 @@ public class sync125_3 : MonoBehaviour
     void Start()
     {
         screenText.text = "";
-        digitText.text = "0";
+        digitText.text = "";
         _moduleId = _moduleIdCounter++;
         GetComponent<KMBombModule>().OnActivate += ActivateModule;
     }
@@ -91,8 +88,40 @@ public class sync125_3 : MonoBehaviour
         int newTextId = UnityEngine.Random.Range(0, words.Length - 1);
         textId = newTextId + ((newTextId < textId) ? 0 : 1);
         screenText.text = words[textId];
-
-        Debug.LogFormat("[SYNC-125 [3] #{0}] Stage {1}. The word is \"{2}\".", _moduleId, stage + 1, trans[textId]);
+        Debug.LogFormat("[SYNC-125-3 #{0}] Stage {1}. The word is \"{2}\".", _moduleId, stage + 1, trans[textId]);
+        switch (values[textId])
+        {
+            case -1:
+                Debug.LogFormat("[SYNC-125-3 #{0}] There are {1} batteries. Expecting number {2}.", _moduleId, info.GetBatteryCount(), info.GetBatteryCount() % 16);
+                break;
+            case -2:
+                int chr = 0;
+                string sn = info.GetSerialNumber();
+                for (int i = 0; i < sn.Length; i++)
+                {
+                    if (char.IsDigit(sn[i]))
+                    {
+                        chr = (int)(sn[i] - '0');
+                        break;
+                    }
+                    if (sn[i] >= 'A' && sn[i] <= 'F')
+                    {
+                        chr = (int)(sn[i] - 'A' + 10);
+                        break;
+                    }
+                }
+                Debug.LogFormat("[SYNC-125-3 #{0}] First hex digit in SN is {1}. Expecting number {2}.", _moduleId, Convert.ToString(chr, 16).ToUpper(), chr);
+                break;
+            case -3:
+                Debug.LogFormat("[SYNC-125-3 #{0}] There are {1} modules. Expecting number {2}.", _moduleId, info.GetModuleNames().Count, info.GetModuleNames().Count % 16);
+                break;
+            case -4:
+                Debug.LogFormat("[SYNC-125-3 #{0}] There are {1} solved modules. Expecting number {2}.", _moduleId, info.GetSolvedModuleNames().Count, info.GetSolvedModuleNames().Count % 16);
+                break;
+            default:
+                Debug.LogFormat("[SYNC-125-3 #{0}] Expecting number {1}.", _moduleId, values[textId]);
+                break;
+        }
         isActive = true;
     }
 
@@ -112,7 +141,7 @@ public class sync125_3 : MonoBehaviour
 
     void OnPress(int pressedButton)
     {
-        GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
+        GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, buttons[pressedButton].transform);
         GetComponent<KMSelectable>().AddInteractionPunch();
         if (!isActive)
         {
@@ -124,7 +153,7 @@ public class sync125_3 : MonoBehaviour
 
     void OnSubmit()
     {
-        GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
+        GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, submitButton.transform);
         GetComponent<KMSelectable>().AddInteractionPunch();
         if (!isActive)
         {
@@ -134,7 +163,6 @@ public class sync125_3 : MonoBehaviour
         switch (values[textId])
         {
             case -1:
-                Debug.LogFormat("[SYNC-125 [3] #{0}] There are {1} batteries. Expecting number {2}.", _moduleId, info.GetBatteryCount(), info.GetBatteryCount() % 16);
                 correct = (digit == info.GetBatteryCount() % 16);
                 break;
             case -2:
@@ -153,19 +181,15 @@ public class sync125_3 : MonoBehaviour
                         break;
                     }
                 }
-                Debug.LogFormat("[SYNC-125 [3] #{0}] First hex digit in SN is {1}. Expecting number {2}.", _moduleId, Convert.ToString(chr, 16).ToUpper(), chr);
                 correct = (digit == chr);
                 break;
             case -3:
-                Debug.LogFormat("[SYNC-125 [3] #{0}] There are {1} modules. Expecting number {2}.", _moduleId, info.GetModuleNames().Count, info.GetModuleNames().Count % 16);
                 correct = (digit == info.GetModuleNames().Count % 16);
                 break;
             case -4:
-                Debug.LogFormat("[SYNC-125 [3] #{0}] There are {1} solved modules. Expecting number {2}.", _moduleId, info.GetSolvedModuleNames().Count, info.GetSolvedModuleNames().Count % 16);
                 correct = (digit == info.GetSolvedModuleNames().Count % 16);
                 break;
             default:
-                Debug.LogFormat("[SYNC-125 [3] #{0}] Expecting number {1}.", _moduleId, values[textId]);
                 break;
         }
         if (correct)
@@ -173,7 +197,8 @@ public class sync125_3 : MonoBehaviour
             StartCoroutine(StageLight(stage));
             if (stage < 3)
             {
-                Debug.LogFormat("[SYNC-125 [3] #{0}] Number {1} was correct. Advancing to stage {2}.", _moduleId, digit, stage + 2);
+                Debug.LogFormat("[SYNC-125-3 #{0}] Number {1} was correct. Advancing to stage {2}.", _moduleId, digit, stage + 2);
+                isActive = false;
                 StartCoroutine(Randomize(true));
             }
             else
@@ -181,14 +206,14 @@ public class sync125_3 : MonoBehaviour
                 screenText.text = "";
                 digitText.text = "0";
                 digit = 0;
-                Debug.LogFormat("[SYNC-125 [3] #{0}] Module solved!", _moduleId);
+                Debug.LogFormat("[SYNC-125-3 #{0}] Module solved!", _moduleId);
                 GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, transform);
                 GetComponent<KMBombModule>().HandlePass();
             }
         }
         else
         {
-            Debug.LogFormat("[SYNC-125 [3] #{0}] Number {1} was incorrect. Resetting the stage.", _moduleId, digit);
+            Debug.LogFormat("[SYNC-125-3 #{0}] Number {1} was incorrect. Resetting the stage.", _moduleId, digit);
             GetComponent<KMBombModule>().HandleStrike();
             isActive = false;
             StartCoroutine(Randomize(true));
@@ -214,23 +239,29 @@ public class sync125_3 : MonoBehaviour
     }
 
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} submit <num> [Submits the specified number ONLY IF it is in base 4. The highest an answer can be is 2 digits]";
+    private readonly string TwitchHelpMessage = @"!{0} submit <num> [Submits the specified number ONLY IF it is in base 4] | Valid numbers cannot contain more than 2 digits";
     #pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
         string[] parameters = command.Split(' ');
         if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
-            if(parameters.Length == 2)
+            yield return null;
+            if (parameters.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters!";
+            }
+            else if (parameters.Length == 2)
             {
                 if (cmdIsValid(parameters[1]))
                 {
-                    yield return null;
-                    //for clearing
-                    buttons[0].OnInteract();
-                    buttons[0].OnInteract();
-                    //end clearing
-                    yield return new WaitForSeconds(0.1f);
+                    if (digit != 0)
+                    {
+                        buttons[0].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
+                        buttons[0].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
+                    }
                     for (int i = 0; i < parameters[1].Length; i++)
                     {
                         if (parameters[1].ElementAt(i).Equals('0'))
@@ -253,8 +284,93 @@ public class sync125_3 : MonoBehaviour
                     }
                     submitButton.OnInteract();
                 }
+                else
+                {
+                    yield return "sendtochaterror The specified number to submit '" + parameters[1] + "' is invalid!";
+                }
+            }
+            else if (parameters.Length == 1)
+            {
+                yield return "sendtochaterror Please specify the number you wish to submit!";
             }
             yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        int start = stage;
+        for (int i = start; i < 4; i++)
+        {
+            while (!isActive) { yield return true; yield return new WaitForSeconds(0.1f); }
+            string base4 = "";
+            int div = values[textId];
+            switch (values[textId])
+            {
+                case -1:
+                    div = info.GetBatteryCount() % 16;
+                    break;
+                case -2:
+                    int chr = 0;
+                    string sn = info.GetSerialNumber();
+                    for (int k = 0; k < sn.Length; k++)
+                    {
+                        if (char.IsDigit(sn[k]))
+                        {
+                            chr = (int)(sn[k] - '0');
+                            break;
+                        }
+                        if (sn[k] >= 'A' && sn[k] <= 'F')
+                        {
+                            chr = (int)(sn[k] - 'A' + 10);
+                            break;
+                        }
+                    }
+                    div = chr;
+                    break;
+                case -3:
+                    div = info.GetModuleNames().Count % 16;
+                    break;
+                case -4:
+                    div = info.GetSolvedModuleNames().Count % 16;
+                    break;
+                default:
+                    break;
+            }
+            while (div != 0)
+            {
+                base4 = base4.Insert(0, (div % 4).ToString());
+                div /= 4;
+            }
+            Debug.Log(base4);
+            if (digit != 0)
+            {
+                buttons[0].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+                buttons[0].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+            for (int j = 0; j < base4.Length; j++)
+            {
+                if (base4[j].Equals('0'))
+                {
+                    buttons[0].OnInteract();
+                }
+                else if (base4[j].Equals('1'))
+                {
+                    buttons[1].OnInteract();
+                }
+                else if (base4[j].Equals('2'))
+                {
+                    buttons[2].OnInteract();
+                }
+                else if (base4[j].Equals('3'))
+                {
+                    buttons[3].OnInteract();
+                }
+                yield return new WaitForSeconds(0.1f);
+            }
+            submitButton.OnInteract();
         }
     }
 }

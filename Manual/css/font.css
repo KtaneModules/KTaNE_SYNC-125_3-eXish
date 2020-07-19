@@ -1,6 +1,13 @@
+/* Manual font */
 @font-face {
   font-family: 'Special Elite';
   font-style: normal;
   font-weight: 400;
   src: local('Special Elite'), local('SpecialElite-Regular'), url(../font/SpecialElite.ttf);
+}
+
+/* SYNC-125 [3] */
+@font-face {
+    font-family: 'SCP';
+    src: url('../font/scp-v01.ttf');
 }
