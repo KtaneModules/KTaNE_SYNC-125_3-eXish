@@ -142,7 +142,7 @@ public class sync125_3 : MonoBehaviour
     void OnPress(int pressedButton)
     {
         GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, buttons[pressedButton].transform);
-        GetComponent<KMSelectable>().AddInteractionPunch();
+        buttons[pressedButton].AddInteractionPunch();
         if (!isActive)
         {
             return;
@@ -154,7 +154,7 @@ public class sync125_3 : MonoBehaviour
     void OnSubmit()
     {
         GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, submitButton.transform);
-        GetComponent<KMSelectable>().AddInteractionPunch();
+        submitButton.AddInteractionPunch();
         if (!isActive)
         {
             return;
@@ -194,17 +194,18 @@ public class sync125_3 : MonoBehaviour
         }
         if (correct)
         {
+            isActive = false;
             StartCoroutine(StageLight(stage));
             if (stage < 3)
             {
                 Debug.LogFormat("[SYNC-125-3 #{0}] Number {1} was correct. Advancing to stage {2}.", _moduleId, digit, stage + 2);
-                isActive = false;
                 StartCoroutine(Randomize(true));
             }
             else
             {
                 screenText.text = "";
                 digitText.text = "0";
+                Debug.LogFormat("[SYNC-125-3 #{0}] Number {1} was correct.", _moduleId, digit);
                 digit = 0;
                 Debug.LogFormat("[SYNC-125-3 #{0}] Module solved!", _moduleId);
                 GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, transform);
@@ -342,7 +343,6 @@ public class sync125_3 : MonoBehaviour
                 base4 = base4.Insert(0, (div % 4).ToString());
                 div /= 4;
             }
-            Debug.Log(base4);
             if (digit != 0)
             {
                 buttons[0].OnInteract();
