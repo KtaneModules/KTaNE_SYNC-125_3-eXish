@@ -22,9 +22,9 @@ public class sync125_3 : MonoBehaviour
     string[] words = new[] {
         "İ'ms'", "ăĠ'n'", "kğ'i", "kĞ'p'", "ăut'",
         "ăġ'r", "ăġ'm", "ărs", "kğp'", "kğk",
-        "ċ'iċ", "ċ'it", "ĕĂn'", "ĕĪ'n'", "ėrs",
+        "ċ'iĊ", "ċ'it", "ĕĂn'", "ĕĪ'n'", "ėrs",
         "Ěit'", "Ěin", "Ěis'", "ĚmĮ'", "ĜĻ'r'",
-        "Ĝrs", "Đim", "ďmĮ'", "Įin", "Įđk",
+        "Ĝrs", "Đim", "ďmĭ'", "Įin", "Įđk",
         "ĭrČ", "pğ'i", "pġ't", "İnt'", "İrt",
         "Ğim", "ĆĠ'n'", "ĆČn'", "ĳim", "ĳip",
         "sğ'i", "ģif", "ģin", "ģir", "ğĂn'"
