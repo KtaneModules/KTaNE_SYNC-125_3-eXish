@@ -116,7 +116,6 @@ public class sync125_3 : MonoBehaviour
                 Debug.LogFormat("[SYNC-125-3 #{0}] There are {1} modules. Expecting number {2}.", _moduleId, info.GetModuleNames().Count, info.GetModuleNames().Count % 16);
                 break;
             case -4:
-                Debug.LogFormat("[SYNC-125-3 #{0}] There are {1} solved modules. Expecting number {2}.", _moduleId, info.GetSolvedModuleNames().Count, info.GetSolvedModuleNames().Count % 16);
                 break;
             default:
                 Debug.LogFormat("[SYNC-125-3 #{0}] Expecting number {1}.", _moduleId, values[textId]);
@@ -187,6 +186,7 @@ public class sync125_3 : MonoBehaviour
                 correct = (digit == info.GetModuleNames().Count % 16);
                 break;
             case -4:
+                Debug.LogFormat("[SYNC-125-3 #{0}] There are {1} solved modules. Expecting number {2}.", _moduleId, info.GetSolvedModuleNames().Count, info.GetSolvedModuleNames().Count % 16);
                 correct = (digit == info.GetSolvedModuleNames().Count % 16);
                 break;
             default:
