@@ -303,9 +303,11 @@ public class sync125_3 : MonoBehaviour
         int start = stage;
         for (int i = start; i < 4; i++)
         {
-            while (!isActive) { yield return true; yield return new WaitForSeconds(0.1f); }
+            while (!isActive) { yield return true; }
             string base4 = "";
             int div = values[textId];
+            int origSolveCt = -1;
+            recalc:
             switch (values[textId])
             {
                 case -1:
@@ -333,6 +335,7 @@ public class sync125_3 : MonoBehaviour
                     div = info.GetModuleNames().Count % 16;
                     break;
                 case -4:
+                    origSolveCt = info.GetSolvedModuleNames().Count % 16;
                     div = info.GetSolvedModuleNames().Count % 16;
                     break;
                 default:
@@ -349,6 +352,8 @@ public class sync125_3 : MonoBehaviour
                 yield return new WaitForSeconds(0.1f);
                 buttons[0].OnInteract();
                 yield return new WaitForSeconds(0.1f);
+                if (origSolveCt != -1 && origSolveCt != info.GetSolvedModuleNames().Count % 16)
+                    goto recalc;
             }
             for (int j = 0; j < base4.Length; j++)
             {
@@ -369,6 +374,8 @@ public class sync125_3 : MonoBehaviour
                     buttons[3].OnInteract();
                 }
                 yield return new WaitForSeconds(0.1f);
+                if (origSolveCt != -1 && origSolveCt != info.GetSolvedModuleNames().Count % 16)
+                    goto recalc;
             }
             submitButton.OnInteract();
         }
